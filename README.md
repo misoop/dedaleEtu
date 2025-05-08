@@ -14,6 +14,3 @@ It allows Master's students to obtain a first-hand experience of some of the nic
 while facing, or not, other teams.
 
 This game is initally inspired by the famous "Hunt the Wumpus"  of [Gregory Yob](https://en.wikipedia.org/wiki/Gregory_Yob).
-
-For more details, see Dedale's website : https://dedale.gitlab.io/# dedaleEtu
-# dedaleEtu
