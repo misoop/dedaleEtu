@@ -1,0 +1,69 @@
+[
+{ 
+	"agentType":"agentExplo",
+	"agentName": "Elsa",
+	"communicationRange": 3,
+	"initialLocation": "free",
+	"backPackCapacityGold": -1,
+	"backPackCapacityDiamond":-1, 
+	"detectionRadius": 0,
+	"strengthExpertise": 1,
+	"lockPickingExpertise":1
+},
+{ 
+	"agentType":"agentExplo",
+	"agentName": "Tim",
+	"communicationRange": 4,
+	"initialLocation": "free",
+	"backPackCapacityGold": -1,
+	"backPackCapacityDiamond":-1, 
+	"detectionRadius": 0,
+	"strengthExpertise": 1,
+	"lockPickingExpertise":1
+  },
+  { 
+    "agentType":"agentCollect",
+    "agentName": "Robert",
+    "communicationRange": 3,
+    "initialLocation": "free",
+    "backPackCapacityGold": 10,
+    "backPackCapacityDiamond":-1, 
+    "detectionRadius": 0,
+    "strengthExpertise": 5,
+    "lockPickingExpertise":5
+    },
+  { 
+    "agentType":"agentCollect",
+    "agentName": "Anna",
+    "communicationRange": 3,
+    "initialLocation": "free",
+    "backPackCapacityGold": -1,
+    "backPackCapacityDiamond":10, 
+    "detectionRadius": 0,
+    "strengthExpertise": 5,
+    "lockPickingExpertise":5
+    },
+  { 
+      "agentType":"agentTanker",
+      "agentName": "Tank",
+      "communicationRange": 3,
+      "initialLocation": "free",
+      "backPackCapacityGold": 100,
+      "backPackCapacityDiamond":100, 
+      "detectionRadius": 0,
+      "strengthExpertise": 1,
+      "lockPickingExpertise":1
+      },
+	  
+	  { 
+	    "agentType":"wumpus",
+	    "agentName": "G1",
+	    "communicationRange": 3,
+	    "initialLocation": "free",
+	    "backPackCapacityGold": 100,
+	    "backPackCapacityDiamond":-1, 
+	    "detectionRadius": 0,
+	    "strengthExpertise": 2,
+	    "lockPickingExpertise":1
+	    }
+]
