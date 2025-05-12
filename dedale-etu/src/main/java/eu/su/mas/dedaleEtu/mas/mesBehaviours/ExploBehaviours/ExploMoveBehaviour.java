@@ -18,8 +18,6 @@ import eu.su.mas.dedale.env.gs.GsLocation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
-import eu.su.mas.dedaleEtu.mas.mesAgents.AgentCollect;
-import eu.su.mas.dedaleEtu.mas.mesAgents.AgentExplo;
 import eu.su.mas.dedaleEtu.mas.mesAgents.AgentExplo;
 import eu.su.mas.dedaleEtu.mas.mesBehaviours.PrintColor;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
@@ -195,7 +193,7 @@ public class ExploMoveBehaviour extends SimpleBehaviour {
 					
 				}
 				
-				if (nextNodeId.equals(tankerPos)) {
+				if ((nextNodeId.equals(tankerPos)) && (nextNodeId != null)) {
 					PrintColor.print(this.myAgent.getLocalName(), "Il y a un tanker devant moi");
 					((AgentExplo) this.myAgent).setIsWaiting(true);
 					sendMsgMove(tankerName);
@@ -209,7 +207,6 @@ public class ExploMoveBehaviour extends SimpleBehaviour {
 					String agentName = null;
 					
 					if (isBlocked) {
-						
 						while (dist < 3) { // deplacement de 3 noeuds
 							List<Couple<Location,List<Couple<Observation,String>>>> list_obs=((AbstractDedaleAgent)this.myAgent).observe();
 							
@@ -235,7 +232,7 @@ public class ExploMoveBehaviour extends SimpleBehaviour {
 											foundFreeLoc = true;
 										}
 										
-										if (obs.getName().equals("AgentName")) {
+										if (obs.getName().equals("AgentName") && (!val.equals(EntityType.WUMPUS.getName()))) {
 											agentName = val;
 										}
 										
@@ -248,7 +245,30 @@ public class ExploMoveBehaviour extends SimpleBehaviour {
 							PrintColor.print(this.myAgent.getLocalName(), "Je vais en "+nextNodeId);
 							
 							if (foundFreeLoc) {
+								
 								((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(nextNodeId));
+								PrintColor.print(this.myAgent.getLocalName(), "Je vais en "+nextNodeId);
+								
+								myPosition = ((AbstractDedaleAgent) this.myAgent).getCurrentPosition();
+								lobs=((AbstractDedaleAgent)this.myAgent).observe();
+								
+								String next=null;
+								
+								//1) remove the current node from openlist and add it to closedNodes.
+								this.myMap.addNode(myPosition.getLocationId(), MapAttribute.closed);
+
+								//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
+								Iterator<Couple<Location, List<Couple<Observation, String>>>> iter=lobs.iterator();
+								while(iter.hasNext()){
+									Location accessibleNode=iter.next().getLeft();
+									boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
+									//the node may exist, but not necessarily the edge
+									if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
+										this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
+										if (next==null && isNewNode) next=accessibleNode.getLocationId();
+									}
+								}
+								
 								
 								try {
 									this.myAgent.doWait(400);
@@ -291,7 +311,7 @@ public class ExploMoveBehaviour extends SimpleBehaviour {
 			
 			boolean isWaiting = ((AgentExplo) this.myAgent).getIsWaiting();
 			
-			if (!isWaiting) {
+			if ((!isWaiting) && (nextNodeId != null)) {
 				((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(nextNodeId));
 				
 				try {
@@ -391,6 +411,9 @@ public class ExploMoveBehaviour extends SimpleBehaviour {
 		PrintColor.print(this.myAgent.getLocalName(), ">>> J'envoie un message MOVE à " + tankerName);
 		
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg2);
+		
+		
+		
 	}
 	
 	public void sendBlockedMsg(String agentName) {

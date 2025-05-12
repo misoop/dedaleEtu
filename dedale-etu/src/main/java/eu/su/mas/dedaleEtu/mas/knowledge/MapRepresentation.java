@@ -39,7 +39,7 @@ public class MapRepresentation implements Serializable {
 
 	public enum MapAttribute {	
 		//agent,open,closed;
-		agent,open,closed, received;
+		agent,open,closed;
 
 	}
 
@@ -52,9 +52,9 @@ public class MapRepresentation implements Serializable {
 	private String defaultNodeStyle= "node {"+"fill-color: black;"+" size-mode:fit;text-alignment:under; text-size:14;text-color:white;text-background-mode:rounded-box;text-background-color:black;}";
 	private String nodeStyle_open = "node.agent {"+"fill-color: forestgreen;"+"}";
 	private String nodeStyle_agent = "node.open {"+"fill-color: blue;"+"}";
-	private String nodeStyle_received = "node.received {" + "fill-color: deeppink;" + "}";
-	private String nodeStyle = defaultNodeStyle + nodeStyle_agent + nodeStyle_open + nodeStyle_received;
-	//private String nodeStyle=defaultNodeStyle+nodeStyle_agent+nodeStyle_open;
+	//private String nodeStyle_received = "node.received {" + "fill-color: deeppink;" + "}";
+	//private String nodeStyle = defaultNodeStyle + nodeStyle_agent + nodeStyle_open + nodeStyle_received;
+	private String nodeStyle=defaultNodeStyle+nodeStyle_agent+nodeStyle_open;
 
 	private Graph g; //data structure non serializable
 	private Viewer viewer; //ref to the display,  non serializable
@@ -319,10 +319,10 @@ public class MapRepresentation implements Serializable {
 				newnode.setAttribute("ui.label", newnode.getId());
 				
 				// en rose juste pour le style, sans perdre l'info d'origine
-			    String originAttr = n.getNodeContent().toString();
-			    newnode.setAttribute("originalAttr", originAttr);
-			    newnode.setAttribute("ui.class", MapAttribute.received.toString());
-				//newnode.setAttribute("ui.class", n.getNodeContent().toString());
+			    //String originAttr = n.getNodeContent().toString();
+			    //newnode.setAttribute("originalAttr", originAttr);
+			    //newnode.setAttribute("ui.class", MapAttribute.received.toString());
+				newnode.setAttribute("ui.class", n.getNodeContent().toString());
 			}else{
 				newnode=this.g.getNode(n.getNodeId());
 				//3 check its attribute. If it is below the one received, update it.

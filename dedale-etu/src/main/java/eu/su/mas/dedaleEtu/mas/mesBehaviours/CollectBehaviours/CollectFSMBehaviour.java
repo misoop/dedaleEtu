@@ -16,11 +16,11 @@ public class CollectFSMBehaviour extends FSMBehaviour {
 	public CollectFSMBehaviour(final AbstractDedaleAgent a, List<String> agentNames) {
 		SimpleBehaviour move = new CollectMoveBehaviour (a);
 		SimpleBehaviour observe = new CollectObserveBehaviour(a);
-		SimpleBehaviour shareMap = new CollectBehaviour (a);
+		SimpleBehaviour collect = new CollectBehaviour (a);
 		
 		registerFirstState(observe, ETAT_OBSERVE);
 		registerState(move, ETAT_MOVE);
-		registerState(shareMap, ETAT_COLLECT);
+		registerState(collect, ETAT_COLLECT);
 		
 		registerTransition(ETAT_OBSERVE, ETAT_OBSERVE, 0);
 		
@@ -29,7 +29,7 @@ public class CollectFSMBehaviour extends FSMBehaviour {
 		
 		registerTransition(ETAT_OBSERVE, ETAT_COLLECT, 2);
 		registerTransition(ETAT_COLLECT, ETAT_MOVE, 2);
-		
+
 	}
 
 }

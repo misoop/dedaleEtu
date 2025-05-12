@@ -168,18 +168,7 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 				}
 			}
 			
-			boolean isBlocked = ((AgentCollect) this.myAgent).getBlocked();
-			
-			if ((current_capacite.compareTo(0) == 0)) { // j'ai usé toute ma capacité
-				Location current_pos = ((AbstractDedaleAgent) this.myAgent).getCurrentPosition();
-				
-				if ((!tankerPos.equals("NULL")) && exploDone && (!current_pos.getLocationId().equals(tankerPos))) { // tanker atteignable
-					PrintColor.print(this.myAgent.getLocalName(), "tankerPos ? : " + tankerPos);
-					
-					nextNodeId = this.myMap.getShortestPath(current_pos.getLocationId(), tankerPos).get(0);
-				}
-			}
-			
+			boolean isBlocked = ((AgentCollect) this.myAgent).getIsBlocked();	
 			
 			//4) select next move.
 			//4.1 If there exist one open node directly reachable, go for it,
@@ -190,9 +179,12 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 				
 				if (!exploDone) {
 					// vers le noeud ouvert le plus proche
+					myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+					//PrintColor.print(this.myAgent.getLocalName(), "MyPos ? : " + myPosition);
 					nextNodeId=this.myMap.getShortestPathToClosestOpenNode(myPosition.getLocationId()).get(0);//getShortestPath(myPosition,this.openNodes.get(0)).get(0);
+					//PrintColor.print(this.myAgent.getLocalName(), "NextNodeID ? : " + nextNodeId);
 					//System.out.println(this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"| nextNode: "+nextNode);
-				
+					
 				} else {
 					myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 					
@@ -202,28 +194,60 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 					
 					if (treasures_pos.size() != 0) {
 						PrintColor.print(this.myAgent.getLocalName(), "Curr_Pos : " + myPosition);
+						
+						myPosition = ((AbstractDedaleAgent) this.myAgent).getCurrentPosition();
+						lobs=((AbstractDedaleAgent)this.myAgent).observe();
+						
+						String next=null;
+						
+						//1) remove the current node from openlist and add it to closedNodes.
+						this.myMap.addNode(myPosition.getLocationId(), MapAttribute.closed);
+
+						//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
+						Iterator<Couple<Location, List<Couple<Observation, String>>>> iter=lobs.iterator();
+						while(iter.hasNext()){
+							Location accessibleNode=iter.next().getLeft();
+							boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
+							//the node may exist, but not necessarily the edge
+							if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
+								this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
+								if (next==null && isNewNode) next=accessibleNode.getLocationId();
+							}
+						}
+						
 						nextNodeId = this.myMap.getShortestPathToClosestObject(myPosition.getLocationId(), treasures_pos).get(0);
 					
-					} else {
-						if ((current_capacite == 0) || (nextNodeId == null)) {
-							List<Couple<Location,List<Couple<Observation,String>>>> l_obs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-							Random r= new Random();
-							int moveId=1+r.nextInt(l_obs.size()-1);
-							
-							nextNodeId = l_obs.get(moveId).getLeft().getLocationId(); // random
-						}
+					} 
+					
+					if (nextNodeId == null) {
+						List<Couple<Location,List<Couple<Observation,String>>>> l_obs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
+						Random r= new Random();
+						int moveId=1+r.nextInt(l_obs.size()-1);
+						
+						nextNodeId = l_obs.get(moveId).getLeft().getLocationId(); // random
+						//PrintColor.print(this.myAgent.getLocalName(), "NextNodeID ? (random) : " + nextNodeId);
 					}
 					
 				}
 				
-				if (nextNodeId.equals(tankerPos)) {
+				if ((current_capacite.compareTo(0) == 0)) { // j'ai usé toute ma capacité
+					Location current_pos = ((AbstractDedaleAgent) this.myAgent).getCurrentPosition();
+					
+					if ((!tankerPos.equals("NULL")) && (!current_pos.getLocationId().equals(tankerPos))) { // tanker atteignable
+						PrintColor.print(this.myAgent.getLocalName(), "tankerPos ? : " + tankerPos);
+						
+						nextNodeId = this.myMap.getShortestPath(current_pos.getLocationId(), tankerPos).get(0);
+					}
+				}
+				
+				if ((nextNodeId != null) && (nextNodeId.equals(tankerPos))) {
 					PrintColor.print(this.myAgent.getLocalName(), "Il y a un tanker devant moi");
 					((AgentCollect) this.myAgent).setIsWaiting(true);
 					sendMsgMove(tankerName);
 					
 				} else {
 					
-					//boolean isBlocked = ((AgentCollect) this.myAgent).getBlocked(); // ie nextNodeId renvoie toujours la meme position
+					isBlocked = ((AgentCollect) this.myAgent).getIsBlocked(); // ie nextNodeId renvoie toujours la meme position
 					List<String> path = new ArrayList<>(); // liste de noeuds à ne pas prendre
 					int dist = 0; 
 					boolean foundFreeLoc = false;
@@ -256,7 +280,7 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 											foundFreeLoc = true;
 										}
 										
-										if (obs.getName().equals("AgentName")) {
+										if (obs.getName().equals("AgentName") && (!val.equals(EntityType.WUMPUS.getName()))) {
 											agentName = val;
 										}
 									}
@@ -265,16 +289,40 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 								path.add(loc.getLocationId());
 							}
 							
-							PrintColor.print(this.myAgent.getLocalName(), "Je vais en "+nextNodeId);
-							
 							if (foundFreeLoc) {
+
 								((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(nextNodeId));
+								PrintColor.print(this.myAgent.getLocalName(), "Je vais en "+nextNodeId);
+								
+								myPosition = ((AbstractDedaleAgent) this.myAgent).getCurrentPosition();
+								lobs=((AbstractDedaleAgent)this.myAgent).observe();
+								
+								String next=null;
+								
+								//1) remove the current node from openlist and add it to closedNodes.
+								this.myMap.addNode(myPosition.getLocationId(), MapAttribute.closed);
+
+								//2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
+								Iterator<Couple<Location, List<Couple<Observation, String>>>> iter=lobs.iterator();
+								while(iter.hasNext()){
+									Location accessibleNode=iter.next().getLeft();
+									boolean isNewNode=this.myMap.addNewNode(accessibleNode.getLocationId());
+									//the node may exist, but not necessarily the edge
+									if (myPosition.getLocationId()!=accessibleNode.getLocationId()) {
+										this.myMap.addEdge(myPosition.getLocationId(), accessibleNode.getLocationId());
+										if (next==null && isNewNode) next=accessibleNode.getLocationId();
+									}
+								}
+								
+								//PrintColor.print(this.myAgent.getLocalName(), "Je ferme le noeud : "+myPosition);
+								
 								
 								try {
 									this.myAgent.doWait(400);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
+								
 								
 							} else {
 								PrintColor.print(this.myAgent.getLocalName(), "ERREUR : je suis bloqué !");
@@ -289,7 +337,7 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 						}
 						
 						
-						((AgentCollect) this.myAgent).setBlocked(false);
+						((AgentCollect) this.myAgent).setIsBlocked(false);
 					}
 				}
 				
@@ -297,30 +345,7 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 
 			} else {
 				//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
-			}
-			
-			//5) At each time step, the agent check if he received a graph from a teammate. 	
-			// If it was written properly, this sharing action should be in a dedicated behaviour set.
-			
-			MessageTemplate msgTemplate=MessageTemplate.and(
-					MessageTemplate.MatchProtocol("SHARE-TOPO"),
-					MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-			ACLMessage msgReceived=this.myAgent.receive(msgTemplate);
-			if (msgReceived!=null) {
-				SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
-				String senderName = msgReceived.getSender().getLocalName();
-				try {
-					sgreceived = (SerializableSimpleGraph<String, MapAttribute>)msgReceived.getContentObject();
-				} catch (UnreadableException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				//System.out.println(this.myAgent.getLocalName() + ": J'ai reçu un message SHARE-TOPO");
-				PrintColor.print(this.myAgent.getLocalName(), "J'ai reçu un message SHARE-TOPO de " + senderName);
-				this.myMap.mergeMap(sgreceived);
-				
-			}
+			}		
 			
 			/***
 			PrintColor.print(this.myAgent.getLocalName(), "***");
@@ -333,7 +358,8 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 			
 			boolean isWaiting = ((AgentCollect) this.myAgent).getIsWaiting();
 			
-			if (!isWaiting) {
+			if ((!isWaiting) && (nextNodeId != null)) {
+				//PrintColor.print(this.myAgent.getLocalName(), "Go to "+nextNodeId);
 				((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(nextNodeId));
 				
 				try {
@@ -373,6 +399,7 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 		return treasures_pos;
 	}
 	
+	
 	public void sendMsgMove (String tankerName) {
 		// Envoi d'un message
 		ACLMessage msg2 = new ACLMessage(ACLMessage.INFORM);
@@ -406,7 +433,11 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 		
 		PrintColor.print(this.myAgent.getLocalName(), ">>> J'envoie un message MOVE à " + tankerName);
 		
+		
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg2);
+		
+		
+		
 	}
 	
 	public void sendBlockedMsg(String agentName) {

@@ -87,9 +87,8 @@ public class ExploObserveBehaviour extends SimpleBehaviour {
 			}
 		}
 		
-		if (isWaiting) {
-			receiveMsgBlocked();
-		}
+		receiveMsgBlocked();
+		
 		
 		lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
 		
@@ -113,29 +112,31 @@ public class ExploObserveBehaviour extends SimpleBehaviour {
 				
 				if ((obs.getName().equals("AgentName"))) {
 					
+					mesVoisins.put(val, loc);
+					
+					// System.out.println("	| Agent à proximité de "+ this.myAgent.getLocalName() +" : " + val + ", Position : " + loc);
+					//PrintColor.print(this.myAgent.getLocalName(), "Agent à côté : " + val + ", Position : " + loc);
+					
+					if (mesVoisinsPrec.containsKey(val)) {
+						if (mesVoisinsPrec.get(val).equals(loc)) { // la position precedente et courante est la meme
+							//PrintColor.print(this.myAgent.getLocalName(), "Position pareille !");
+							
+							boolean isBlocked = ((AgentExplo) this.myAgent).getIsBlocked();
+							
+							if (!isBlocked) {
+								((AgentExplo) this.myAgent).setIsBlocked(true);
+							}
+							
+							break;
+							
+						}
+					
+					}
+					
 					if (val.equals(EntityType.WUMPUS.getName())) {
+
 						
 					} else {
-						mesVoisins.put(val, loc);
-						
-						// System.out.println("	| Agent à proximité de "+ this.myAgent.getLocalName() +" : " + val + ", Position : " + loc);
-						//PrintColor.print(this.myAgent.getLocalName(), "Agent à côté : " + val + ", Position : " + loc);
-						
-						if (mesVoisinsPrec.containsKey(val)) {
-							if (mesVoisinsPrec.get(val).equals(loc)) { // la position precedente et courante est la meme
-								//PrintColor.print(this.myAgent.getLocalName(), "Position pareille !");
-								
-								boolean isBlocked = ((AgentExplo) this.myAgent).getIsBlocked();
-								
-								if (!isBlocked) {
-									((AgentExplo) this.myAgent).setIsBlocked(true);
-								}
-								
-								break;
-								
-							}
-						
-						}
 
 						receiveMsgExploDone();
 						
@@ -176,8 +177,11 @@ public class ExploObserveBehaviour extends SimpleBehaviour {
 
 				// Mise a jour de la liste des trésors
 				Long currentTimeMillis = System.currentTimeMillis();
-				((AgentExplo) this.myAgent).setTreasures(type, loc.getLocationId(), currentTimeMillis, quantity, lockPicking, strength, lockIsOpen);
-			
+				
+				if (quantity != null) {
+					((AgentExplo) this.myAgent).setTreasures(type, loc.getLocationId(), currentTimeMillis, quantity, lockPicking, strength, lockIsOpen);
+				}
+				
 				HashMap<String, List<Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>>>> treasures = ((AgentExplo) this.myAgent).getTreasures();
 				//PrintColor.print(this.myAgent.getLocalName(), "Liste des trésors : " + treasures);
 			
@@ -190,6 +194,7 @@ public class ExploObserveBehaviour extends SimpleBehaviour {
 					if (list.size() == 0) { // la voie est libre
 						((AbstractDedaleAgent)this.myAgent).moveTo(loc);
 						((AgentExplo) this.myAgent).setIsWaiting(false);
+						((AgentExplo) this.myAgent).setIsBlocked(false);
 						PrintColor.print(this.myAgent.getLocalName(), "La voie est libre, je prends la place du Tanker et je n'attends plus.");
 						
 						try {
@@ -314,7 +319,8 @@ public class ExploObserveBehaviour extends SimpleBehaviour {
 					((AgentExplo) this.myAgent).setTankerPos(c);
 				}
 				
-				// ((AgentExplo) this.myAgent).setBlocked(false);
+				((AgentExplo) this.myAgent).setIsBlocked(false);
+				//((AgentExplo) this.myAgent).setIsWaiting(true);
 				
 			} else {
 				if (!tankerPos.equals("NULL")) {
@@ -526,7 +532,7 @@ public class ExploObserveBehaviour extends SimpleBehaviour {
 				PrintColor.print(this.myAgent.getLocalName(), "Je me décale.");
 				((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation (available_pos_wagent.getFirst()));
 				
-				((AgentExplo) this.myAgent).setIsWaiting(false);
+				//((AgentExplo) this.myAgent).setIsWaiting(false);
 				
 				try {
 					this.myAgent.doWait(400);

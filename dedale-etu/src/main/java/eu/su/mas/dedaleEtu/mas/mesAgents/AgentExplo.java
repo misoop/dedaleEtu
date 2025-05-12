@@ -41,6 +41,8 @@ public class AgentExplo extends AbstractDedaleAgent {
 	private boolean isWaiting = false;
 	private List<Couple<String, Location>> tankerPos = new ArrayList<>();
 	
+	private String wumpusPos = null;
+	
 	
 	protected void setup(){
 
@@ -334,7 +336,14 @@ public class AgentExplo extends AbstractDedaleAgent {
 		}
 	}
 	
+	public String getWumpusPos () {
+		return wumpusPos;
+	}
 	
+	public void setWumpusPos (String pos) {
+		wumpusPos = pos;
+	}
+
 	public HashMap<String, Couple<MapRepresentation, Boolean>> getMyDico() {
 		return dico;
 	}

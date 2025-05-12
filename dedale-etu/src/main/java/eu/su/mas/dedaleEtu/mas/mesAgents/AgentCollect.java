@@ -13,6 +13,7 @@ import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.platformManagment.*;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
+import eu.su.mas.dedaleEtu.mas.mesBehaviours.PrintColor;
 import eu.su.mas.dedaleEtu.mas.mesBehaviours.CollectBehaviours.CollectFSMBehaviour;
 import eu.su.mas.dedaleEtu.princ.ConfigurationFile;
 import jade.core.behaviours.Behaviour;
@@ -156,11 +157,11 @@ public class AgentCollect extends AbstractDedaleAgent {
 		this.exploDone = true;
 	}
 	
-	public boolean getBlocked() {
+	public boolean getIsBlocked() {
 		return blocked;
 	}
 	
-	public void setBlocked(boolean blocked) {
+	public void setIsBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}
 	
@@ -266,24 +267,95 @@ public class AgentCollect extends AbstractDedaleAgent {
 		return treasures;
 	}
 	
-	public List<String> toListPos(Observation obs) {
+	public List<String> toListPos(Observation myTreasureType) {
 		List<String> list_pos = new ArrayList<>();
+		List<Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>>> list= null;
 		
-		for (String key : this.treasures.keySet()) {
-			if ((key.equals(obs.getName())) || (obs.equals(Observation.ANY_TREASURE))) {
-				List<Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>>> list= (List<Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>>>) this.treasures.get(key);
-				
-				for (Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>> elem : list) {
-					if (elem.get_3() != 0) {
+		if (this.treasures.containsKey(myTreasureType.getName())) {
+			list = this.treasures.get(myTreasureType.getName());
+		}
+		
+		if (list != null) {
+			for (Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>> elem : list) {
+				if (elem.get_3() != 0) {
+					if (elem.get_4().getThird()) {
 						list_pos.add(elem.get_1());
+						
+					} else {
+						
+						Integer mylockpicking = null;
+						Integer mystrength = null;
+						
+						for (Couple<Observation, Integer> c : this.myExpertise) {
+							Observation o = c.getLeft();
+							Integer v = c.getRight();
+							
+							if (o.equals(Observation.LOCKPICKING)) {
+								mylockpicking = v;
+							}
+							
+							if (o.equals(Observation.STRENGH)) {
+								mystrength = v;
+							}
+						}
+						
+						if (mylockpicking >= elem.get_4().getFirst()) {
+							if (mystrength >= elem.get_4().getSecond()) {
+								list_pos.add(elem.get_1());
+							}
+						}
 					}
 					
 				}
+				
 			}
+			
 		}
+		
 		
 		return list_pos;
 	}
+	
+	
+	public List<String> toListPosTogether() {
+		List<String> list_pos = new ArrayList<>();
+		
+		for (String key : this.treasures.keySet()) {
+			for (Tuple4<String, Long, Integer, Tuple3<Integer, Integer, Boolean>> elem : this.treasures.get(key)) {
+				if (elem.get_3() != 0) {
+					Integer mylockpicking = null;
+					Integer mystrength = null;
+					for (Couple<Observation, Integer> c : this.myExpertise) {
+						Observation o = c.getLeft();
+						Integer v = c.getRight();
+						
+						if (o.equals(Observation.LOCKPICKING)) {
+							mylockpicking = v;
+						}
+						
+						if (o.equals(Observation.STRENGH)) {
+							mystrength = v;
+						}
+					}
+					
+					if (mylockpicking >= elem.get_4().getFirst()) {
+						if (mystrength >= elem.get_4().getSecond()) {
+							list_pos.add(elem.get_1());
+						}
+					}
+					
+					
+				}
+				
+			}
+		}
+		
+		
+		
+		
+		return list_pos;
+	}
+	
 	
 	public List<String> getVisitedPos () {
 		return visitedPos;
@@ -307,11 +379,12 @@ public class AgentCollect extends AbstractDedaleAgent {
 	
 	public void setTankerPos (Couple<String, Location> tank) {
 		if (!this.tankerPos.contains(tank)) {
+			PrintColor.print(this.getLocalName(), "Je rajoute le tank de position : " + tank.getRight().getLocationId());
 			this.tankerPos.add(tank);
 		}
 	}
 	
-	public List<String> getToVisit (Observation obs) {
+	public List<String> getToVisit (Observation myTreasureType) {
 		
 		for (String visited_pos : visitedPos) {
 			if (toVisit.contains(visited_pos)) {
@@ -320,7 +393,23 @@ public class AgentCollect extends AbstractDedaleAgent {
 		}
 		
 		if (toVisit.size() == 0) { // on recommence le parcours
-			toVisit = toListPos(obs);
+			toVisit = toListPos(myTreasureType);
+			
+			if (toVisit.size() == 0) { // ils ne peuvent plus collecter tout seul
+				toVisit = toListPosTogether();
+				
+				if (toVisit.size() == 0) {
+					PrintColor.print(this.getLocalName(), "Pas assez d'infos.");
+					
+				} else {
+					PrintColor.print(this.getLocalName(), "Il faut se mobiliser pour ramasser les trésors.");
+				}
+				
+				
+			} else {
+				PrintColor.print(this.getLocalName(), "Il reste des trésors que je peux ramasser.");
+			}
+			
 			resetVisitedPos();
 		}
 		
