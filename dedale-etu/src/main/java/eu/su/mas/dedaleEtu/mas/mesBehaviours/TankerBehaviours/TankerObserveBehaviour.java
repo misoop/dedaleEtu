@@ -120,6 +120,12 @@ public class TankerObserveBehaviour extends SimpleBehaviour {
 							((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(myPos));
 							((AgentTanker) this.myAgent).setIsWaiting(false);
 							((AgentTanker) this.myAgent).setIsPassed(false);
+							
+							try {
+								this.myAgent.doWait(400);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 						
 						

@@ -117,7 +117,7 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 			 */
 			
 			try {
-				this.myAgent.doWait(100);
+				this.myAgent.doWait(400);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -270,6 +270,12 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 							if (foundFreeLoc) {
 								((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(nextNodeId));
 								
+								try {
+									this.myAgent.doWait(400);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								
 							} else {
 								PrintColor.print(this.myAgent.getLocalName(), "ERREUR : je suis bloqué !");
 								if (agentName != null) {
@@ -329,6 +335,12 @@ public class CollectMoveBehaviour extends SimpleBehaviour {
 			
 			if (!isWaiting) {
 				((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(nextNodeId));
+				
+				try {
+					this.myAgent.doWait(400);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			
 		}

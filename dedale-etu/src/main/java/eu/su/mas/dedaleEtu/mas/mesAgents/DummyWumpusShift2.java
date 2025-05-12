@@ -99,7 +99,7 @@ public class DummyWumpusShift2 extends AbstractDedaleAgent{
 		private boolean grabbed;
 
 		public RandomShiftBehaviour (final AbstractDedaleAgent myagent) {
-			super(myagent,1000);
+			super(myagent,400);
 			r = new Random();
 			waitingTimeBeforeDropOff=minShiftDistance+r.nextInt(maxShiftDistance);
 			currentWaitingTimeBeforeDromOff=0;

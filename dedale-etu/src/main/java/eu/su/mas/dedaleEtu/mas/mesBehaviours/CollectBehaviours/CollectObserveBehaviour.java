@@ -214,6 +214,12 @@ public class CollectObserveBehaviour extends SimpleBehaviour {
 						((AgentCollect) this.myAgent).setIsWaiting(false);
 						PrintColor.print(this.myAgent.getLocalName(), "La voie est libre, je prends la place du Tanker et je n'attends plus.");
 						
+						try {
+							this.myAgent.doWait(400);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						
 					}
 				}
 				
@@ -508,6 +514,12 @@ public class CollectObserveBehaviour extends SimpleBehaviour {
 				((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation (available_pos_wagent.getFirst()));
 				
 				((AgentCollect) this.myAgent).setIsWaiting(false);
+				
+				try {
+					this.myAgent.doWait(400);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		

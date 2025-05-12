@@ -97,6 +97,12 @@ public class TankerMoveBehaviour extends SimpleBehaviour {
 						
 						lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
 						available_pos = this.toListAvailablePos(lobs);
+						
+						try {
+							this.myAgent.doWait(400);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				
@@ -114,6 +120,12 @@ public class TankerMoveBehaviour extends SimpleBehaviour {
 						((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(next_loc));
 				
 						i = i - 1;
+						
+						try {
+							this.myAgent.doWait(400);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 					
 					PrintColor.print(this.myAgent.getLocalName(), "Je suis revenu en " + ((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
@@ -146,6 +158,12 @@ public class TankerMoveBehaviour extends SimpleBehaviour {
 				
 				if (available_pos_wagent.size() != 0) {
 					((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(available_pos_wagent.getFirst()));
+					
+					try {
+						this.myAgent.doWait(400);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					
 					PrintColor.print(this.myAgent.getLocalName(), "Je me pousse en " + available_pos_wagent.getFirst());
 					((AgentTanker) this.myAgent).setIsMoving(false);
@@ -187,6 +205,12 @@ public class TankerMoveBehaviour extends SimpleBehaviour {
 				if (next_loc != null) {
 					PrintColor.print(this.myAgent.getLocalName(), "Je me pousse en " + next_loc);
 					((AbstractDedaleAgent)this.myAgent).moveTo(new GsLocation(next_loc));
+					
+					try {
+						this.myAgent.doWait(400);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 					
 					((AgentTanker) this.myAgent).setIsMoving(false);
 					
