@@ -96,7 +96,7 @@ Depuis une pièce, un agent perçoit notamment :
 
 ---
 
-## Exemple d’une exécution Dédale
+## Exemple d’une exécution
 
 Voici un exemple d'affichage de l’environnement, montrant les agents, trésors et interactions :
 
