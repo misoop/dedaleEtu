@@ -32,10 +32,10 @@ Un **Golem** (adversaire non agressif) se déplace dans la carte et :
 
 ## Types d’agents
 
-### Agent `silo`
-- Capacité de stockage **illimitée**.
-- Ne peut **pas** ramasser directement les ressources.
-- Peut se déplacer et **communiquer** avec les autres agents.
+### Agents `exploreurs`
+- **Explorent** l'environnement,
+- Peut aider à ouvrir les coffres (mais ne peut pas ramasser les trésors !),
+- **Communiquent** avec les agents pour envoyer les cartes et l'emplacements des trésors
 
 ### Agents `collecteurs`
 - Possèdent un **sac à dos** de capacité limitée `M`.
@@ -43,6 +43,14 @@ Un **Golem** (adversaire non agressif) se déplace dans la carte et :
 - Ont deux types de **compétences** :
   - `lockpicking` (serrurerie) : ouverture des coffres ;
   - `strength` (force) : collecte effective du trésor.
+
+### Agent `silo` (Tank)
+- Capacité de stockage **illimitée**.
+- Ne peut **pas** ramasser directement les ressources.
+- Peut se déplacer et **communiquer** avec les autres agents.
+
+### Golem
+Marche aléatoirement (on ne le contrôle pas).
 
 Le ramassage d’un trésor :
 - nécessite un certain nombre de points en **serrurerie** (pour ouvrir),
@@ -52,7 +60,7 @@ Le ramassage d’un trésor :
 
 ---
 
-## erceptions & communications
+## Perceptions & communications
 
 ### Perception locale
 Depuis une pièce, un agent perçoit notamment :
