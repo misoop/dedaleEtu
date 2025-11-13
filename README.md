@@ -5,6 +5,13 @@ L’objectif est de développer en binôme une variante multi-agent du jeu _Hunt
 
 ---
 
+## Contributeurs
+
+- Michelle SONG
+- Camélia BOUALI
+
+---
+
 ## Objectifs du projet
 
 - Modéliser et programmer un **système multi-agent coopératif**.
