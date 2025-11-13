@@ -100,5 +100,5 @@ Depuis une pièce, un agent perçoit notamment :
 
 Voici un exemple d'affichage de l’environnement, montrant les agents, trésors et interactions :
 
-![Exécution Dedale](capture.png)
+![Exécution Dedale](capture.jpeg)
 
